@@ -8,7 +8,7 @@ const Contact: React.FC = () => {
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
-  const TO_ADDRESS = 'info@jasnav.co.in';
+  const TO_ADDRESS = 'info@codecraftsinfotech.in';
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +81,7 @@ const Contact: React.FC = () => {
               <h3 className="text-lg font-semibold mb-2">Email</h3>
               <p className="text-white/70 text-sm mb-2">Prefer direct email? Use the addresses below.</p>
               <div className="space-y-1">
-                <a href="mailto:info@jasnav.co.in" className="text-blue-400 hover:text-blue-300">info@jasnav.co.in</a>
+                <a href="mailto:info@codecraftsinfotech.in" className="text-blue-400 hover:text-blue-300">info@codecraftsinfotech.in</a>
                 <div/>
                 <a href="mailto:jasnav.co@gmail.com" className="text-blue-400 hover:text-blue-300">jasnav.co@gmail.com</a>
               </div>
