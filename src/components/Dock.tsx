@@ -147,11 +147,11 @@ export default function Dock({
   items,
   className = "",
   spring = { mass: 0.1, stiffness: 150, damping: 12 },
-  magnification = 70,
-  distance = 200,
-  panelHeight = 68,
-  dockHeight = 256,
-  baseItemSize = 50,
+  magnification = 60,
+  distance = 180,
+  panelHeight = 56,
+  dockHeight = 200,
+  baseItemSize = 44,
 }: DockProps) {
   const mouseX = useMotionValue(Infinity);
   const isHovered = useMotionValue(0);

@@ -165,10 +165,10 @@ const About = () => {
         {/* Company Description */}
         <div className="mt-20 bg-gray-900 rounded-3xl p-12 border border-gray-800">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8 text-center text-white">About Jasnav It Solutions</h2>
+            <h2 className="text-3xl font-bold mb-8 text-center text-white">About CodeCrafts Infotech</h2>
             <div className="space-y-6 text-gray-300 text-lg leading-relaxed">
               <p>
-                At <strong className="text-white">Jasnav It Solutions</strong>, we are focused on productivity and creating smooth workflows that drive business success. We are a full-service software company specializing in building modern, scalable, and user-friendly solutions that help businesses optimize their operations and achieve seamless digital transformation.
+                At <strong className="text-white">CodeCrafts Infotech</strong>, we are focused on productivity and creating smooth workflows that drive business success. We are a full-service software company specializing in building modern, scalable, and user-friendly solutions that help businesses optimize their operations and achieve seamless digital transformation.
               </p>
               <p>
                 From end-to-end project management to delivering web applications, mobile applications, and e-commerce platforms, our team ensures every project enhances productivity and creates smooth workflows. With expertise in AI integration and automation, we streamline your business processes and eliminate bottlenecks to maximize efficiency.

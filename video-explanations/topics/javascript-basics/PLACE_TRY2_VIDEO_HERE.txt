@@ -1,7 +1,0 @@
-Please copy your try2.mp4 video file to this directory.
-
-The video should be named: try2.mp4
-
-This video will be displayed in the "Conditionals and Loops" section of the JavaScript Module: Complete Programming Guide.
-
-Once you copy the video file here, it will automatically be available in the course learning interface.
