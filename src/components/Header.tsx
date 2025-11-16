@@ -1,84 +1,31 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext';
+import { Link } from 'react-router-dom';
+import { brandName } from '@/brand';
 
-interface HeaderProps {
-  hideDock?: boolean;
-}
-
-const Header = ({ hideDock = false }: HeaderProps) => {
-  const navigate = useNavigate();
-  const { theme } = useTheme();
-  const [scrolled, setScrolled] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 100);
-    const timeInterval = setInterval(() => setCurrentTime(new Date()), 1000);
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearInterval(timeInterval);
-    };
-  }, []);
-
-  const formatTime = (date: Date) =>
-    date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-  const formatDate = (date: Date) =>
-    date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-  if (hideDock) return null;
-
+const Header = () => {
   return (
-    <header className={`fixed left-1/2 transform -translate-x-1/2 z-50 transition-all duration-500 ease-out ${scrolled ? 'top-2' : 'top-4'}`}>
-      <nav className="flex items-center space-x-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-6 py-3 shadow-2xl transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-3xl">
-        {/* Left - Date and Time */}
-        <div className="flex items-center">
-          <div className="text-white/90 font-medium">
-            <div className="text-sm">{formatTime(currentTime)}</div>
-            <div className="text-xs text-white/70">{formatDate(currentTime)}</div>
+    <header className="fixed top-0 left-0 right-0 z-50">
+      <div className="container mx-auto px-6 py-4">
+        <div className="flex items-center justify-between rounded-full bg-white/8 backdrop-blur-md ring-1 ring-white/20 px-6 py-3 text-white">
+          {/* Brand */}
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-white/10 ring-1 ring-white/20 flex items-center justify-center text-sm">◎</div>
+            <span className="font-semibold tracking-wide">{brandName}</span>
+          </div>
+
+          {/* Nav */}
+          <nav className="hidden md:flex items-center gap-6 text-xs">
+            <Link to="/" className="hover:text-white">HOME</Link>
+            <Link to="/about" className="hover:text-white">ABOUT US</Link>
+            <Link to="/career" className="hover:text-white">CAREER</Link>
+            <Link to="/contact" className="hover:text-white">CONTACT</Link>
+          </nav>
+
+          {/* CTA */}
+          <div className="flex items-center gap-3">
+            <a href="#require-call" className="softpro-btn softpro-btn--secondary">REQUIRE A CALL</a>
           </div>
         </div>
-
-        {/* Separator */}
-        <div className="w-px h-8 bg-white/20"></div>
-
-        {/* Navigation Icons - Only Home, About, Contact */}
-        <div className="flex items-center space-x-3">
-          {/* Home */}
-          <button onClick={() => navigate('/')} className="nav-dock-item group relative" title="Home">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            <span className="nav-tooltip">Home</span>
-          </button>
-
-          {/* About */}
-          <button onClick={() => navigate('/about')} className="nav-dock-item group relative" title="About">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="nav-tooltip">About</span>
-          </button>
-
-          {/* Contact */}
-          <button onClick={() => navigate('/contact')} className="nav-dock-item group relative" title="Contact">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            <span className="nav-tooltip">Contact</span>
-          </button>
-        </div>
-
-        {/* Separator */}
-        <div className="w-px h-8 bg-white/20"></div>
-
-        {/* Right - Brand */}
-        <div className="flex items-center">
-          <div className="text-white/90 font-bold text-sm">CodeCrafts Infotech</div>
-        </div>
-      </nav>
+      </div>
     </header>
   );
 };

@@ -1,0 +1,193 @@
+/* Soft Pro theme inspired styles */
+
+.softpro-hero {
+  --sp-bg-top: #0b0b0e;
+  --sp-bg-bottom: #2a0e14;
+  background: radial-gradient(1200px 500px at 50% -100px, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.0) 60%),
+              linear-gradient(180deg, var(--sp-bg-top) 0%, var(--sp-bg-bottom) 100%);
+}
+
+.softpro-grid {
+  position: relative;
+}
+
+/* Layered Title */
+.softpro-title-wrap {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: clamp(0.25rem, 2vw, 1rem);
+  flex-wrap: wrap;
+  margin-top: clamp(2rem, 8vw, 6rem);
+  max-width: min(100%, 1200px);
+  margin-left: clamp(0rem, 1vw, 1rem);
+  margin-right: 0;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.softpro-title {
+  position: relative;
+  z-index: 1;
+  text-transform: uppercase;
+  line-height: 0.9;
+  font-size: clamp(2.25rem, 8vw, 8rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.softpro-title--primary {
+  color: rgba(255,255,255,0.95);
+  -webkit-text-stroke: 1px rgba(255,255,255,0.16);
+}
+
+.softpro-title--secondary {
+  position: static;
+  transform: none;
+  color: rgba(255,255,255,0.35);
+  -webkit-text-stroke: 0.5px rgba(255,255,255,0.10);
+  filter: saturate(80%);
+}
+
+/* Blur square placement on the right of the title */
+.softpro-blur-right {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translate(clamp(12px, 2vw, 24px), -50%);
+  width: clamp(260px, 26vw, 460px);
+  height: clamp(260px, 30vw, 520px);
+  z-index: 0;
+  opacity: 0.95;
+}
+
+/* Layered card stack */
+.softpro-card-stack {
+  position: relative;
+  width: min(360px, 60vw);
+  height: min(220px, 40vw);
+  perspective: 1000px;
+}
+
+.softpro-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  transform-origin: center;
+}
+
+.softpro-card--back { 
+  transform: rotate(-6deg) translateX(-26px) translateY(10px) scale(0.96);
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.softpro-card--mid {
+  transform: rotate(-2.5deg) translateX(-8px) translateY(4px) scale(0.98);
+  background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.10);
+}
+.softpro-card--front {
+  transform: rotate(1deg);
+  background: #0f0f12;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Robots showcase */
+.robots-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+@media (min-width: 768px) {
+  .robots-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.robot-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+.robot-card:hover {
+  transform: translateY(-4px) rotate(-0.5deg);
+  box-shadow: 0 28px 70px rgba(0,0,0,0.5);
+}
+.robot-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  filter: contrast(95%) saturate(110%);
+}
+.robot-card .caption {
+  padding: 12px 14px;
+  color: rgba(255,255,255,0.88);
+  font-weight: 600;
+}
+
+/* Logo marquee */
+.logo-marquee {
+  overflow: hidden;
+  position: relative;
+}
+.logo-track {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  width: max-content;
+  animation: marquee-scroll 18s linear infinite;
+}
+.logo-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  width: 44px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.16);
+}
+.logo-item img { width: 24px; height: 24px; }
+
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* CTAs */
+.softpro-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 9999px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all 180ms ease;
+}
+
+.softpro-btn--primary {
+  color: #0b0b0e;
+  background: #ff4747;
+  box-shadow: 0 20px 30px rgba(255, 71, 71, 0.25);
+}
+.softpro-btn--primary:hover {
+  background: #ff5f5f;
+}
+
+.softpro-btn--secondary {
+  color: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.softpro-btn--secondary:hover {
+  background: rgba(255,255,255,0.14);
+}
