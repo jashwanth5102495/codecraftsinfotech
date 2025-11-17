@@ -68,6 +68,7 @@ const LogoLoop: React.FC<LogoLoopProps> = ({
 
   const [seqWidth, setSeqWidth] = useState(0);
   const [seqHeight, setSeqHeight] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
   const isVertical = direction === 'up' || direction === 'down';
@@ -78,6 +79,11 @@ const LogoLoop: React.FC<LogoLoopProps> = ({
   // Measure sequence size
   const measure = () => {
     const el = seqRef.current;
+    const containerEl = containerRef.current;
+    if (containerEl) {
+      const rect = containerEl.getBoundingClientRect();
+      setContainerWidth(Math.max(1, Math.round(rect.width)));
+    }
     if (!el) return;
     const rect = el.getBoundingClientRect();
     setSeqWidth(Math.max(1, Math.round(rect.width)));
@@ -183,7 +189,8 @@ const LogoLoop: React.FC<LogoLoopProps> = ({
     );
   };
 
-  const copies = 3; // minimal copies for seamless loop
+  // Ensure enough copies to fully cover the viewport width plus buffer
+  const copies = Math.max(3, Math.ceil(containerWidth / Math.max(1, seqWidth)) + 2);
 
   return (
     <div

@@ -14,10 +14,16 @@
 
 .logo-loop__track {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: auto;
+  bottom: 0;
   will-change: transform;
   display: flex;
   flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  min-width: max-content;
 }
 
 .logo-loop__track--vertical {
@@ -63,15 +69,15 @@
 .logo-loop__fade--horizontal {
   background: linear-gradient(to right,
     var(--fade-color, transparent) 0%,
-    transparent 12%,
-    transparent 88%,
+    transparent 6%,
+    transparent 94%,
     var(--fade-color, transparent) 100%);
 }
 
 .logo-loop__fade--vertical {
   background: linear-gradient(to bottom,
     var(--fade-color, transparent) 0%,
-    transparent 12%,
-    transparent 88%,
+    transparent 6%,
+    transparent 94%,
     var(--fade-color, transparent) 100%);
 }
