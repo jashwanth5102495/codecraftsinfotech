@@ -15,6 +15,7 @@ body {
   background-color: #000000;
   color: #ffffff;
   overflow-x: hidden;
+  zoom: 0.9; /* Default site-wide scale: 90% (Chromium-based browsers) */
 }
 
 /* Explanation Card (lesson intro) */
