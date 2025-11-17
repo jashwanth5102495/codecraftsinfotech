@@ -2,6 +2,15 @@ import './SoftPro.css';
 import { heroPrimary, heroSecondary } from '@/brand';
 import ShapeBlur from './ShapeBlur';
 import GhostCursor from './GhostCursor';
+import LogoLoop from './LogoLoop';
+import { SiReact, SiNextdotjs, SiTypescript, SiTailwindcss } from 'react-icons/si';
+
+const techLogos = [
+  { node: <SiReact />, title: 'React', href: 'https://react.dev' },
+  { node: <SiNextdotjs />, title: 'Next.js', href: 'https://nextjs.org' },
+  { node: <SiTypescript />, title: 'TypeScript', href: 'https://www.typescriptlang.org' },
+  { node: <SiTailwindcss />, title: 'Tailwind CSS', href: 'https://tailwindcss.com' }
+];
 
 const Hero = () => {
   return (
@@ -73,6 +82,24 @@ const Hero = () => {
           </div>
         </div>
       </section>
+
+      {/* Logo Loop Divider */}
+      <div className="bg-black py-8">
+        <div className="container mx-auto px-6">
+          <LogoLoop
+            logos={techLogos}
+            speed={120}
+            direction="left"
+            logoHeight={48}
+            gap={40}
+            hoverSpeed={0}
+            scaleOnHover
+            fadeOut
+            fadeOutColor="#0b0b0e"
+            ariaLabel="Technology partners"
+          />
+        </div>
+      </div>
 
       {/* Innovation Section - separate and black */}
       <section className="relative py-24 bg-black text-white overflow-hidden">
