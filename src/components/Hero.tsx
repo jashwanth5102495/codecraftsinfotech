@@ -45,7 +45,7 @@ const Hero = () => {
                       pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio : 1}
                       shapeSize={0.7}
                       roundness={0.12}
-                      borderSize={0.06}
+                      borderSize={0.085}
                       circleSize={0.5}
                       circleEdge={1}
                       offsetX={0.08}
