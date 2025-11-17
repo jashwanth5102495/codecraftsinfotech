@@ -19,7 +19,7 @@
   align-items: baseline;
   gap: clamp(0.25rem, 2vw, 1rem);
   flex-wrap: wrap;
-  margin-top: clamp(2rem, 8vw, 6rem);
+  margin-top: clamp(3rem, 9vw, 7rem);
   max-width: min(100%, 1200px);
   margin-left: clamp(0rem, 1vw, 1rem);
   margin-right: 0;
