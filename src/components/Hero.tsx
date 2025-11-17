@@ -121,8 +121,7 @@ const Hero = () => {
             {/* Cursor trail overlay */}
             <GhostCursor
               color="#B19EEF"
--              brightness={1}
-+              brightness={0.35}
+              brightness={0.35}
               edgeIntensity={0}
               trailLength={50}
               inertia={0.5}
