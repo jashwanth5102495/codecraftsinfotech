@@ -82,8 +82,6 @@ const Contact: React.FC = () => {
               <p className="text-white/70 text-sm mb-2">Prefer direct email? Use the addresses below.</p>
               <div className="space-y-1">
                 <a href="mailto:info@codecraftsinfotech.in" className="text-blue-400 hover:text-blue-300">info@codecraftsinfotech.in</a>
-                <div/>
-                <a href="mailto:jasnav.co@gmail.com" className="text-blue-400 hover:text-blue-300">jasnav.co@gmail.com</a>
               </div>
             </div>
             <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">

@@ -78,12 +78,45 @@ const Hero = () => {
       <section className="relative py-24 bg-black text-white overflow-hidden">
         <div className="container mx-auto px-6">
           <div className="relative rounded-xl ring-1 ring-white/10 overflow-hidden" style={{ height: 600 }}>
-            <div className="absolute inset-0 p-8 z-10">
-              <h3 className="text-2xl font-semibold mb-3">Innovation with Design & Modern UI Components</h3>
-              <p className="text-sm text-white/80 max-w-2xl">
-                We deliver refined, modern interfaces built with thoughtful motion and accessible components — always on time.
-                Our design system emphasizes clarity, performance, and delightful micro-interactions that elevate your brand.
-              </p>
+            <div className="absolute inset-0 z-10 flex items-center justify-center p-10">
+              <div className="max-w-5xl text-center space-y-6">
+                <h3 className="text-3xl md:text-4xl font-bold tracking-tight">Innovation with Design, Modern UI Components & Complete Technology Solutions</h3>
+                <p className="text-white/80 text-sm md:text-base leading-relaxed">
+                  We deliver refined, high-performance digital experiences across web, mobile, and AI-driven applications.
+                  From intuitive interfaces to fully automated workflows, our team builds solutions that combine modern design,
+                  accessible components, and thoughtful motion.
+                </p>
+                <p className="text-white/80 text-sm md:text-base leading-relaxed">
+                  We undertake all kinds of projects — from small feature builds to large-scale enterprise systems — and ensure
+                  reliable, on-time delivery every single time. Our expertise covers:
+                </p>
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 text-left">
+                  <div className="rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                    <div className="text-xs text-white/60">Web Applications</div>
+                    <div className="text-sm text-white/90">React, Next.js, Vue, Angular, custom frameworks</div>
+                  </div>
+                  <div className="rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                    <div className="text-xs text-white/60">Mobile Applications</div>
+                    <div className="text-sm text-white/90">iOS, Android, cross-platform</div>
+                  </div>
+                  <div className="rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                    <div className="text-xs text-white/60">AI Integrations & Automations</div>
+                    <div className="text-sm text-white/90">Chatbots, ML models, process automation</div>
+                  </div>
+                  <div className="rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                    <div className="text-xs text-white/60">Cloud & Backend Systems</div>
+                    <div className="text-sm text-white/90">APIs, databases, scalable architecture</div>
+                  </div>
+                  <div className="rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                    <div className="text-xs text-white/60">UI/UX Design Systems</div>
+                    <div className="text-sm text-white/90">Modern components, micro-interactions, accessibility</div>
+                  </div>
+                </div>
+                <p className="text-white/80 text-sm md:text-base leading-relaxed">
+                  With a focus on clarity, performance, and seamless user experiences, we help brands innovate faster and build
+                  products that truly stand out.
+                </p>
+              </div>
             </div>
             {/* Cursor trail overlay */}
             <GhostCursor
