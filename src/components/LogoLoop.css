@@ -2,6 +2,7 @@
 .logo-loop {
   position: relative;
   overflow: hidden;
+  height: var(--logo-height, 40px);
 }
 
 .logo-loop__viewport {

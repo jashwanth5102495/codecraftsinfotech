@@ -12,6 +12,19 @@ const Footer = () => (
         </div>
         <p className="text-xs">© {new Date().getFullYear()} {brandName} — All rights reserved.</p>
       </div>
+
+      {/* Contact & Offices */}
+      <div className="mt-6 grid sm:grid-cols-2 gap-6 text-sm">
+        <div>
+          <div className="text-white/80 font-medium">Contact</div>
+          <a href="mailto:info@codecraftsinfotech.in" className="text-white/90 hover:text-white">info@codecraftsinfotech.in</a>
+        </div>
+        <div>
+          <div className="text-white/80 font-medium">Office</div>
+          <div className="text-white/90">Hyderabad, Telangana — India</div>
+          <div className="text-white/90">Austin, Texas — USA</div>
+        </div>
+      </div>
     </div>
   </footer>
 );
