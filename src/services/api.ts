@@ -198,6 +198,55 @@ class ApiService {
       body: JSON.stringify(paymentData),
     });
   }
+
+  // Purchases endpoints
+  async createPurchase(purchase: any): Promise<ApiResponse<any>> {
+    return this.request<any>('/purchases', {
+      method: 'POST',
+      body: JSON.stringify(purchase),
+    });
+  }
+
+  async getPurchases(): Promise<ApiResponse<any[]>> {
+    return this.request<any[]>('/purchases', { method: 'GET' }, true);
+  }
+
+  // Referral codes (new backend endpoints)
+  async getReferrals(): Promise<ApiResponse<any[]>> {
+    const primary = await this.request<any[]>('/referrals', { method: 'GET' }, true);
+    if (!primary.success && (primary.error||'').toLowerCase().includes('not found')) {
+      return this.request<any[]>('/referral-codes', { method: 'GET' }, true);
+    }
+    return primary;
+  }
+
+  async createReferral(payload: { agentName: string; email: string; code: string; discountPercent: number }): Promise<ApiResponse<any>> {
+    const primary = await this.request<any>('/referrals', { method: 'POST', body: JSON.stringify(payload) }, true);
+    if (!primary.success && (primary.error||'').toLowerCase().includes('not found')) {
+      return this.request<any>('/referral-codes', { method: 'POST', body: JSON.stringify(payload) }, true);
+    }
+    return primary;
+  }
+
+  async deleteReferral(code: string): Promise<ApiResponse<any>> {
+    const primary = await this.request<any>(`/referrals/${encodeURIComponent(code)}`, { method: 'DELETE' }, true);
+    if (!primary.success && (primary.error||'').toLowerCase().includes('not found')) {
+      return this.request<any>(`/referral-codes/${encodeURIComponent(code)}`, { method: 'DELETE' }, true);
+    }
+    return primary;
+  }
+
+  async validateReferral(code: string): Promise<ApiResponse<{ valid: boolean; discountPercent?: number; agentName?: string }>> {
+    const primary = await this.request<{ valid: boolean; discountPercent?: number; agentName?: string }>(
+      '/referrals/validate', { method: 'POST', body: JSON.stringify({ code }) }
+    );
+    if (!primary.success && (primary.error||'').toLowerCase().includes('not found')) {
+      return this.request<{ valid: boolean; discountPercent?: number; agentName?: string }>(
+        '/referral-codes/validate', { method: 'POST', body: JSON.stringify({ code }) }
+      );
+    }
+    return primary;
+  }
 }
 
 export default new ApiService();
