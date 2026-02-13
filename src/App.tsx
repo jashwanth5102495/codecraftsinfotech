@@ -10,7 +10,7 @@ import ProjectsPage from './components/ProjectsPage'
 import ProjectEnrollment from './components/ProjectEnrollment'
 import CheckoutPage from './components/CheckoutPage'
 import PaymentPage from '@/components/PaymentPage'
-import Career from '@/components/Career'
+import InternshipPage from '@/components/InternshipPage'
 import AdminPage from '@/components/AdminPage'
 
 function HomePage() {
@@ -33,7 +33,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<><Header /><About /><Footer /></>} />
-            <Route path="/career" element={<><Header /><Career /><Footer /></>} />
+            <Route path="/internship" element={<><Header /><InternshipPage /><Footer /></>} />
             <Route path="/contact" element={<><Header /><Contact /><Footer /></>} />
             <Route path="/projects" element={<><Header /><ProjectsPage /><Footer /></>} />
             <Route path="/projects/enroll" element={<><Header /><ProjectEnrollment /><Footer /></>} />

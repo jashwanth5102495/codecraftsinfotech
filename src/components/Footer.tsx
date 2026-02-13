@@ -21,7 +21,7 @@ const Footer = () => (
         </div>
         <div>
           <div className="text-white/80 font-medium">Office</div>
-          <div className="text-white/90">Hyderabad, Telangana — India</div>
+          <div className="text-white/90">Bengaluru, Karnataka — India</div>
           <div className="text-white/90">Austin, Texas — USA</div>
         </div>
       </div>

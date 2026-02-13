@@ -19,7 +19,7 @@ const Header = () => {
           <nav className="hidden md:flex items-center gap-6 text-xs">
             <Link to="/" className="hover:text-white">HOME</Link>
             <Link to="/about" className="hover:text-white">ABOUT US</Link>
-            <Link to="/career" className="hover:text-white">CAREER</Link>
+            <Link to="/internship" className="hover:text-white">INTERNSHIP</Link>
             <Link to="/projects" className="hover:text-white">PROJECTS</Link>
             <Link to="/contact" className="hover:text-white">CONTACT</Link>
           </nav>

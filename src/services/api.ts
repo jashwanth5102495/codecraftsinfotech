@@ -73,9 +73,13 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     try {
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
         ...options.headers as Record<string, string>,
       };
+
+      // Only set Content-Type to application/json if body is NOT FormData
+      if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+      }
 
       if (requireAuth) {
         const token = this.getAuthToken();
@@ -246,6 +250,18 @@ class ApiService {
       );
     }
     return primary;
+  }
+
+  // Internship Applications
+  async submitApplication(formData: FormData): Promise<ApiResponse<any>> {
+    return this.request<any>('/applications', {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
+  async getApplications(): Promise<ApiResponse<any[]>> {
+    return this.request<any[]>('/applications', { method: 'GET' }, true);
   }
 }
 

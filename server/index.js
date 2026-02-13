@@ -3,6 +3,7 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import multer from 'multer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,13 +12,29 @@ const PORT = process.env.PORT || 5000;
 
 // Paths
 const dataDir = path.join(__dirname, 'data');
+const uploadsDir = path.join(__dirname, 'uploads');
 const purchasesFile = path.join(dataDir, 'purchases.json');
 const referralsFile = path.join(dataDir, 'referrals.json');
+const applicationsFile = path.join(dataDir, 'applications.json');
 
-// Ensure data directory and file exist
+// Ensure directories and files exist
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 if (!fs.existsSync(purchasesFile)) fs.writeFileSync(purchasesFile, '[]', 'utf-8');
 if (!fs.existsSync(referralsFile)) fs.writeFileSync(referralsFile, '[]', 'utf-8');
+if (!fs.existsSync(applicationsFile)) fs.writeFileSync(applicationsFile, '[]', 'utf-8');
+
+// Multer setup
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir)
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, uniqueSuffix + '-' + file.originalname)
+  }
+})
+const upload = multer({ storage: storage });
 
 // Middleware
 app.use(express.json());
@@ -32,6 +49,7 @@ app.use(cors({
   },
   credentials: true,
 }));
+app.use('/uploads', express.static(uploadsDir));
 
 // Simple admin token
 const ADMIN_USERNAME = 'admin';
@@ -49,6 +67,12 @@ function readReferrals(){
 }
 function writeReferrals(list){
   fs.writeFileSync(referralsFile, JSON.stringify(list, null, 2), 'utf-8');
+}
+function readApplications(){
+  try { return JSON.parse(fs.readFileSync(applicationsFile, 'utf-8')); } catch { return []; }
+}
+function writeApplications(list){
+  fs.writeFileSync(applicationsFile, JSON.stringify(list, null, 2), 'utf-8');
 }
 
 // Health
@@ -216,6 +240,51 @@ app.post('/api/referral-codes/validate', (req, res) => {
   const found = list.find(r => r.code.toLowerCase() === String(code).toLowerCase() && r.active);
   if (!found) return res.json({ success:true, data: { valid:false } });
   res.json({ success:true, data: { valid:true, discountPercent: found.discountPercent, agentName: found.agentName } });
+});
+
+// Internship Applications
+app.post('/api/applications', upload.single('resume'), (req, res) => {
+  try {
+    const { name, email, phone, college, year, domain, project, coverLetter } = req.body;
+    const resume = req.file ? `/uploads/${req.file.filename}` : null;
+    
+    if (!name || !email || !phone || !domain) {
+      return res.status(400).json({ success: false, error: 'Missing required fields' });
+    }
+
+    const applications = readApplications();
+    const newApplication = {
+      id: Date.now().toString(),
+      name,
+      email,
+      phone,
+      college,
+      year,
+      domain,
+      project,
+      coverLetter,
+      resume,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+    
+    applications.push(newApplication);
+    writeApplications(applications);
+    
+    res.json({ success: true, data: newApplication });
+  } catch (error) {
+    console.error('Error submitting application:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
+app.get('/api/applications', (req, res) => {
+  const auth = req.headers.authorization || '';
+  const token = auth.replace('Bearer ', '');
+  if (token !== ADMIN_TOKEN) return res.status(401).json({ success: false, error: 'Unauthorized' });
+  
+  const applications = readApplications();
+  res.json({ success: true, data: applications });
 });
 
 // 404 fallback

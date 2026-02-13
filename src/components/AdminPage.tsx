@@ -22,8 +22,9 @@ const AdminPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   // New: referrals state
-  const [activeTab, setActiveTab] = useState<'purchases' | 'referrals'>('purchases');
+  const [activeTab, setActiveTab] = useState<'purchases' | 'referrals' | 'applications'>('purchases');
   const [referrals, setReferrals] = useState<any[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
   const [refForm, setRefForm] = useState({ agentName: '', email: '', code: '', discountPercent: 10 });
   const [refStatus, setRefStatus] = useState<string | null>(null);
 
@@ -31,7 +32,7 @@ const AdminPage: React.FC = () => {
     // try token verify if exists
     (async ()=>{
       const res = await api.verifyToken();
-      if (res.success && res.data?.valid){ setIsAuthed(true); fetchPurchases(); fetchReferrals(); }
+      if (res.success && res.data?.valid){ setIsAuthed(true); fetchPurchases(); fetchReferrals(); fetchApplications(); }
     })();
   },[]);
 
@@ -39,7 +40,7 @@ const AdminPage: React.FC = () => {
     setLoading(true); setError(null);
     const res = await api.login({ username, password });
     setLoading(false);
-    if (res.success && res.data){ setIsAuthed(true); fetchPurchases(); fetchReferrals(); }
+    if (res.success && res.data){ setIsAuthed(true); fetchPurchases(); fetchReferrals(); fetchApplications(); }
     else setError(res.error || 'Login failed');
   }
 
@@ -103,6 +104,23 @@ const AdminPage: React.FC = () => {
     }
   }
 
+  // Fetch internship applications for admin
+  async function fetchApplications(){
+    try {
+      setLoading(true); setError(null);
+      const res = await api.getApplications();
+      if (res.success && res.data){
+        setApplications(res.data as any[]);
+      } else {
+        setError(res.error || 'Failed to fetch applications');
+      }
+    } catch (err){
+      setError(err instanceof Error ? err.message : 'Failed to fetch applications');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-black text-white pt-24 pb-16">
       <div className="max-w-6xl mx-auto px-4">
@@ -121,8 +139,13 @@ const AdminPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <button onClick={()=>setActiveTab('purchases')} className={`px-3 py-2 rounded-lg border ${activeTab==='purchases'?'bg-white/15 border-white/30':'border-white/20'}`}>Purchases</button>
               <button onClick={()=>setActiveTab('referrals')} className={`px-3 py-2 rounded-lg border ${activeTab==='referrals'?'bg-white/15 border-white/30':'border-white/20'}`}>Referrals</button>
+              <button onClick={()=>setActiveTab('applications')} className={`px-3 py-2 rounded-lg border ${activeTab==='applications'?'bg-white/15 border-white/30':'border-white/20'}`}>Internship Applications</button>
               <div className="ml-auto flex gap-2">
-                <button onClick={activeTab==='purchases'?fetchPurchases:fetchReferrals} className="px-3 py-2 border border-white/20 rounded-md">Refresh</button>
+                <button onClick={() => {
+                  if (activeTab === 'purchases') fetchPurchases();
+                  else if (activeTab === 'referrals') fetchReferrals();
+                  else fetchApplications();
+                }} className="px-3 py-2 border border-white/20 rounded-md">Refresh</button>
                 <button onClick={logout} className="px-3 py-2 border border-white/20 rounded-md">Logout</button>
               </div>
             </div>
@@ -244,6 +267,69 @@ const AdminPage: React.FC = () => {
                             <td className="p-2 text-white/60">{new Date(r.createdAt).toLocaleString()}</td>
                             <td className="p-2">
                               <button onClick={()=>deleteReferral(r.code)} className="px-2 py-1 rounded bg-red-600/60 border border-red-600/40">Delete</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab==='applications' && (
+              <div className="bg-white/5 rounded-xl border border-white/10 p-4">
+                <div className="flex items-center mb-4">
+                  <h2 className="text-lg font-semibold">Internship Applications</h2>
+                </div>
+                {loading && <div className="text-white/70 text-sm">Loading...</div>}
+                {error && <div className="text-red-400 text-sm">{error}</div>}
+                {!loading && applications.length === 0 && (
+                  <div className="text-white/60 text-sm">No applications yet.</div>
+                )}
+                {applications.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr className="text-left text-white/70">
+                          <th className="p-2">Date</th>
+                          <th className="p-2">Name</th>
+                          <th className="p-2">Email / Phone</th>
+                          <th className="p-2">Education</th>
+                          <th className="p-2">Domain / Project</th>
+                          <th className="p-2">Resume</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {applications.map((app, idx) => (
+                          <tr key={idx} className="border-t border-white/10">
+                            <td className="p-2 text-white/60">{new Date(app.createdAt).toLocaleString()}</td>
+                            <td className="p-2">{app.name}</td>
+                            <td className="p-2">
+                              <div>{app.email}</div>
+                              <div className="text-xs text-white/50">{app.phone}</div>
+                            </td>
+                            <td className="p-2">
+                              <div>{app.college}</div>
+                              <div className="text-xs text-white/50">{app.year}</div>
+                            </td>
+                            <td className="p-2">
+                              <div>{app.domain}</div>
+                              <div className="text-xs text-white/50">{app.project}</div>
+                            </td>
+                            <td className="p-2">
+                              {app.resume ? (
+                                <a 
+                                  href={`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}${app.resume}`} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-400 hover:text-blue-300 underline"
+                                >
+                                  Download Resume
+                                </a>
+                              ) : (
+                                <span className="text-white/30">N/A</span>
+                              )}
                             </td>
                           </tr>
                         ))}
