@@ -15,6 +15,8 @@ const InternshipPage: React.FC = () => {
     email: '',
     phone: '',
     college: '',
+    universityName: '',
+    currentCourse: '',
     year: '',
     domain: 'Web Development',
     project: '',
@@ -207,6 +209,8 @@ const InternshipPage: React.FC = () => {
           email: '',
           phone: '',
           college: '',
+          universityName: '',
+          currentCourse: '',
           year: '',
           domain: 'Web Development',
           project: '',
@@ -294,7 +298,7 @@ const InternshipPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">College / University</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">College</label>
                 <input
                   required
                   type="text"
@@ -303,6 +307,31 @@ const InternshipPage: React.FC = () => {
                   onChange={handleInputChange}
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   placeholder="Your College Name"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">University Name</label>
+                <input
+                  type="text"
+                  name="universityName"
+                  value={formData.universityName}
+                  onChange={handleInputChange}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  placeholder="Your University Name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Currently Pursuing Course</label>
+                <input
+                  type="text"
+                  name="currentCourse"
+                  value={formData.currentCourse}
+                  onChange={handleInputChange}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  placeholder="e.g., B.Tech CSE, B.Sc, MBA"
                 />
               </div>
             </div>

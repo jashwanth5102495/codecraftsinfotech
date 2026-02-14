@@ -360,6 +360,8 @@ const AdminPage: React.FC = () => {
                             </td>
                             <td className="p-2">
                               <div>{app.college}</div>
+                              {app.universityName && <div className="text-xs text-white/50">{app.universityName}</div>}
+                              {app.currentCourse && <div className="text-xs text-white/50">{app.currentCourse}</div>}
                               <div className="text-xs text-white/50">{app.year}</div>
                             </td>
                             <td className="p-2">
@@ -449,6 +451,18 @@ const AdminPage: React.FC = () => {
                     <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">College</label>
                     <p className="text-white text-lg">{selectedApplication.college}</p>
                   </div>
+                  {selectedApplication.universityName && (
+                    <div>
+                      <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">University</label>
+                      <p className="text-white text-lg">{selectedApplication.universityName}</p>
+                    </div>
+                  )}
+                  {selectedApplication.currentCourse && (
+                    <div>
+                      <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">Current Course</label>
+                      <p className="text-white text-lg">{selectedApplication.currentCourse}</p>
+                    </div>
+                  )}
                   <div>
                     <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">Year of Study</label>
                     <p className="text-white text-lg">{selectedApplication.year}</p>

@@ -63,6 +63,13 @@
   opacity: 0.95;
 }
 
+/* Hide the blur square on small screens (phone view) */
+@media (max-width: 767px) {
+  .softpro-blur-right {
+    display: none !important;
+  }
+}
+
 /* Layered card stack */
 .softpro-card-stack {
   position: relative;
