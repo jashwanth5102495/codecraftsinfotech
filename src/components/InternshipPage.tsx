@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import api from '@/services/api';
 import { motion } from 'framer-motion';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const InternshipPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [txnId, setTxnId] = useState('');
+  const [txnError, setTxnError] = useState<string | null>(null);
+  const [confirmingPayment, setConfirmingPayment] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -117,6 +123,15 @@ const InternshipPage: React.FC = () => {
       "Microservices Deployment Pipeline",
       "Server Configuration Drift Detector",
       "Incident Response Automation"
+    ],
+    "Special Projects": [
+      "Car Rental Booking System",
+      "College Canteen",
+      "Hostel Management",
+      "AI Resume Analyzer",
+      "AI-Crop-Suggestion with Real Time GPS",
+      "AI-CS-Chatbot",
+      "AI-Mail-Automation (Multi AI Agent)"
     ]
   };
 
@@ -161,7 +176,32 @@ const InternshipPage: React.FC = () => {
       const response = await api.submitApplication(data);
 
       if (response.success) {
-        setStatus({ type: 'success', message: 'Application submitted successfully! We will contact you soon.' });
+        setStatus({ type: 'success', message: 'Application submitted successfully! Redirecting to payment...' });
+        // Navigate to the Payment page interface with prefilled internship item and student details
+        navigate('/payment', {
+          state: {
+            student: {
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone,
+              college: formData.college,
+              year: formData.year,
+              domain: formData.domain,
+              project: formData.project,
+              context: 'internship_application'
+            },
+            items: [
+              {
+                title: 'Internship Registration',
+                price: 4000,
+                originalPrice: 6500,
+                quantity: 1,
+                includes: ['Project', 'Internship Certificate', 'Online Training']
+              }
+            ],
+            subtotal: 4000
+          }
+        });
         setFormData({
           name: '',
           email: '',
@@ -365,7 +405,7 @@ const InternshipPage: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <span>Submit Application</span>
+                  <span>Continue with Payment</span>
                   <Send className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </>
               )}
@@ -373,6 +413,115 @@ const InternshipPage: React.FC = () => {
           </form>
         </motion.div>
       </div>
+
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#1a1a1a] border border-white/10 p-8 rounded-2xl max-w-lg w-full relative shadow-2xl"
+          >
+            <button 
+              onClick={() => setShowSuccessModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-white">Application Received — Continue with Payment</h3>
+              </div>
+
+              <ol className="space-y-3 text-sm text-gray-300 mb-6">
+                <li className="flex items-start gap-2">
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-white/80 text-xs">1</span>
+                  <span>Scan the QR below with any UPI app to pay your internship fee.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-white/80 text-xs">2</span>
+                  <span>Enter the Transaction/Reference ID you receive after payment.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-white/80 text-xs">3</span>
+                  <span>We will verify and send the synopsis and payment confirmation shortly.</span>
+                </li>
+              </ol>
+
+              <div className="flex flex-col items-center gap-4 mb-4">
+                <img src="/qr.png" alt="QR Code" className="w-48 h-48 rounded-md border border-white/20" />
+                <div className="w-full">
+                  <label className="text-xs text-white/70">Transaction ID</label>
+                  <input
+                    className="mt-1 w-full rounded-md bg-white/10 border border-white/20 px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    placeholder="Enter transaction/reference ID"
+                    value={txnId}
+                    onChange={(e)=>{ setTxnId(e.target.value); if (txnError) setTxnError(null); }}
+                  />
+                  {txnError && <div className="text-xs text-red-400 mt-1">{txnError}</div>}
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={async ()=>{
+                    const id = txnId.trim();
+                    if (!id) { setTxnError('Please enter the transaction ID.'); return; }
+                    setTxnError(null);
+                    setConfirmingPayment(true);
+                    try {
+                      const payload = {
+                        txnId: id,
+                        student: {
+                          name: formData.name,
+                          email: formData.email,
+                          phone: formData.phone,
+                          college: formData.college,
+                          year: formData.year,
+                          domain: formData.domain,
+                          project: formData.project,
+                          note: 'Internship Registration'
+                        },
+                        items: [{ title: 'Internship Registration', price: 0, quantity: 1 }],
+                        subtotal: 0,
+                        taxes: 0,
+                        total: 0
+                      };
+                      const res = await api.createPurchase(payload);
+                      if (res.success){
+                        setTxnError(null);
+                        setShowSuccessModal(false);
+                        alert('Payment recorded successfully. Project synopsis and training details will be mailed shortly.');
+                      } else {
+                        setTxnError(res.error || 'Failed to record payment. Please try again.');
+                      }
+                    } catch (err){
+                      setTxnError('Error recording payment. Please try again.');
+                    } finally {
+                      setConfirmingPayment(false);
+                    }
+                  }}
+                  disabled={confirmingPayment}
+                  className={`flex-1 py-3 rounded-xl font-semibold text-white ${confirmingPayment ? 'bg-blue-700/60 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} transition-colors`}
+                >
+                  {confirmingPayment ? 'Confirming…' : 'Confirm Payment'}
+                </button>
+                <button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="flex-1 py-3 rounded-xl font-semibold border border-white/20 text-white hover:bg-white/5 transition-colors"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </main>
   );
 };

@@ -17,13 +17,20 @@ const [popup, setPopup] = useState<{title: string; message: string} | null>(null
   const [applyError, setApplyError] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string | null>(null);
 
+// Support overrides from navigation state (for Internship flow)
+const state = (location.state as any) || {};
+const overrideItems = Array.isArray(state.items) ? state.items : null;
+const overrideSubtotal = typeof state.subtotal === 'number' ? state.subtotal : null;
 // Cart totals to keep Payment consistent with Checkout
-const { items, subtotal } = useCart();
+const { items: cartItems, subtotal: cartSubtotal } = useCart();
+const items = overrideItems ?? cartItems;
+const subtotal = overrideSubtotal ?? cartSubtotal;
+const originalSubtotal = items.reduce((sum: number, it: any) => sum + (it.originalPrice ?? it.price ?? 0) * (it.quantity ?? 1), 0);
 const shipping = 0;
 const taxes = 0;
 const discountAmount = Math.round(subtotal * (discountPercent > 0 ? discountPercent : 0) / 100);
 const total = subtotal - discountAmount + shipping;
-  const student = (location.state as any)?.student || null;
+  const student = state.student || null;
   const formatINR = (n: number) => `₹${n.toLocaleString('en-IN')}`;
 
   const Icon: React.FC<{ id: typeof method }>=({ id })=>{
@@ -85,17 +92,23 @@ const total = subtotal - discountAmount + shipping;
     );
   };
 
+  const backTo = state?.context === 'internship_application' ? '/internship' : '/checkout';
   return (
     <main className="min-h-screen bg-black text-white pt-24 pb-16">
       <div className="mx-auto max-w-6xl px-4 grid grid-cols-12 gap-6">
         {/* Left Summary */}
         <aside className="col-span-12 lg:col-span-5">
           <div className="rounded-2xl p-6 min-h-[560px] bg-gradient-to-br from-fuchsia-600 via-pink-500 to-violet-700 lg:sticky lg:top-24">
-            <button onClick={()=>navigate('/checkout')} className="text-white/80 text-sm flex items-center gap-2 mb-6">
+            <button onClick={()=>navigate(backTo)} className="text-white/80 text-sm flex items-center gap-2 mb-6">
               <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path d="M15 18l-6-6 6-6"/></svg>
               Back
             </button>
-            <div className="text-3xl font-bold">{formatINR(total)}</div>
+            <div className="text-3xl font-bold flex items-center gap-3">
+              <span>{formatINR(total)}</span>
+              {originalSubtotal > total && (
+                <span className="text-white/80 text-base line-through">{formatINR(originalSubtotal)}</span>
+              )}
+            </div>
             <div className="text-white/80 text-xs mt-1">Review and confirm your payment below.</div>
 
             <div className="mt-8 bg-white/10 rounded-xl p-4">
@@ -107,6 +120,17 @@ const total = subtotal - discountAmount + shipping;
                 </div>
                 <div className="ml-auto text-sm">{formatINR(subtotal)}</div>
               </div>
+              {/* Includes information for internship flow */}
+              {Array.isArray(items) && items.length === 1 && items[0]?.includes && (
+                <div className="mt-3 text-xs text-white/90">
+                  <div className="opacity-80">Includes:</div>
+                  <ul className="list-disc list-inside space-y-1 mt-1">
+                    {items[0].includes.map((txt: string, i: number)=>(
+                      <li key={i}>{txt}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div className="mt-3 flex gap-2">
                 <input
                   className="flex-1 px-3 py-2 rounded-md bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -254,7 +278,7 @@ const total = subtotal - discountAmount + shipping;
                         const payload = {
                           txnId: id,
                           student: { ...(student || { note: 'No student details provided' }), referralCode: referralCode.trim() || null, discountPercent },
-                          items: items.map(i => ({ title: i.title, price: i.price, quantity: i.quantity, certificate: i.certificate })),
+                          items: items.map((i: any) => ({ title: i.title, price: i.price, quantity: i.quantity, certificate: i.certificate })),
                           subtotal,
                           taxes, // now 0
                           total,

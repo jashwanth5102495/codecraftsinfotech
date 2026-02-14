@@ -39,7 +39,7 @@ function App() {
             <Route path="/projects/enroll" element={<><Header /><ProjectEnrollment /><Footer /></>} />
             <Route path="/checkout" element={<><Header /><CheckoutPage /><Footer /></>} />
             <Route path="/payment" element={<PaymentPage />} />
-            <Route path="/admin" element={<><Header /><AdminPage /><Footer /></>} />
+            <Route path="/CIT944832" element={<><Header /><AdminPage /><Footer /></>} />
           </Routes>
         </Router>
       </CartProvider>

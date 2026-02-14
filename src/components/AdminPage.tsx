@@ -25,6 +25,7 @@ const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'purchases' | 'referrals' | 'applications'>('purchases');
   const [referrals, setReferrals] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
+  const [selectedApplication, setSelectedApplication] = useState<any | null>(null);
   const [refForm, setRefForm] = useState({ agentName: '', email: '', code: '', discountPercent: 10 });
   const [refStatus, setRefStatus] = useState<string | null>(null);
 
@@ -108,16 +109,55 @@ const AdminPage: React.FC = () => {
   async function fetchApplications(){
     try {
       setLoading(true); setError(null);
-      const res = await api.getApplications();
-      if (res.success && res.data){
-        setApplications(res.data as any[]);
+      const [appsRes, purchasesRes] = await Promise.all([
+        api.getApplications(),
+        api.getPurchases()
+      ]);
+      if (appsRes.success && appsRes.data){
+        let apps: any[] = appsRes.data as any[];
+        if (purchasesRes.success && purchasesRes.data){
+          const purchases: any[] = purchasesRes.data as any[];
+          // Build latest purchase-by-email map
+          const latestByEmail: Record<string, { txnId: string; createdAt: string }> = {};
+          for (const p of purchases){
+            const email = String(p?.student?.email || '').toLowerCase();
+            if (!email) continue;
+            const prev = latestByEmail[email];
+            if (!prev || new Date(p.createdAt).getTime() >= new Date(prev.createdAt).getTime()){
+              latestByEmail[email] = { txnId: p.txnId, createdAt: p.createdAt };
+            }
+          }
+          // Attach computed txn id for display if missing on record
+          apps = apps.map(a => {
+            if (!a.txnId){
+              const em = String(a.email || '').toLowerCase();
+              const hit = latestByEmail[em];
+              if (hit) return { ...a, _computedTxnId: hit.txnId };
+            }
+            return a;
+          });
+        }
+        setApplications(apps);
       } else {
-        setError(res.error || 'Failed to fetch applications');
+        setError(appsRes.error || 'Failed to fetch applications');
       }
     } catch (err){
       setError(err instanceof Error ? err.message : 'Failed to fetch applications');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function removeApplication(id: string){
+    const ok = window.confirm('Delete this application permanently? This cannot be undone.');
+    if (!ok) return;
+    setError(null);
+    const res = await api.deleteApplication(id);
+    if (res.success){
+      setApplications(prev => prev.filter(a => String(a.id) !== String(id)));
+      if (selectedApplication?.id === id) setSelectedApplication(null);
+    } else {
+      setError(res.error || 'Failed to delete application');
     }
   }
 
@@ -297,14 +337,23 @@ const AdminPage: React.FC = () => {
                           <th className="p-2">Email / Phone</th>
                           <th className="p-2">Education</th>
                           <th className="p-2">Domain / Project</th>
+                          <th className="p-2">Txn ID</th>
                           <th className="p-2">Resume</th>
+                          <th className="p-2">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {applications.map((app, idx) => (
                           <tr key={idx} className="border-t border-white/10">
                             <td className="p-2 text-white/60">{new Date(app.createdAt).toLocaleString()}</td>
-                            <td className="p-2">{app.name}</td>
+                            <td className="p-2">
+                              <button 
+                                onClick={() => setSelectedApplication(app)}
+                                className="text-blue-400 hover:text-blue-300 hover:underline font-medium text-left"
+                              >
+                                {app.name}
+                              </button>
+                            </td>
                             <td className="p-2">
                               <div>{app.email}</div>
                               <div className="text-xs text-white/50">{app.phone}</div>
@@ -318,11 +367,15 @@ const AdminPage: React.FC = () => {
                               <div className="text-xs text-white/50">{app.project}</div>
                             </td>
                             <td className="p-2">
+                              {(app.txnId || app._computedTxnId)
+                                ? <span className="font-mono text-xs text-white/90">{app.txnId || app._computedTxnId}</span>
+                                : <span className="text-white/30">—</span>}
+                            </td>
+                            <td className="p-2">
                               {app.resume ? (
                                 <a 
                                   href={`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}${app.resume}`} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
+                                  download
                                   className="text-blue-400 hover:text-blue-300 underline"
                                 >
                                   Download Resume
@@ -330,6 +383,14 @@ const AdminPage: React.FC = () => {
                               ) : (
                                 <span className="text-white/30">N/A</span>
                               )}
+                            </td>
+                            <td className="p-2">
+                              <button
+                                onClick={()=>removeApplication(app.id)}
+                                className="px-2 py-1 rounded bg-red-600/70 hover:bg-red-700 border border-red-600/50 text-white text-xs"
+                              >
+                                Delete
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -339,6 +400,111 @@ const AdminPage: React.FC = () => {
                 )}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Application Details Modal */}
+        {selectedApplication && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl">
+              <button 
+                onClick={() => setSelectedApplication(null)}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              
+              <div className="mb-6 border-b border-white/10 pb-4">
+                <h3 className="text-2xl font-bold text-white">Application Details</h3>
+                <p className="text-gray-400 text-sm mt-1">Submitted on {new Date(selectedApplication.createdAt).toLocaleString()}</p>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">Full Name</label>
+                    <p className="text-white text-lg font-medium">{selectedApplication.name}</p>
+                  </div>
+                      <div>
+                        <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">Transaction ID</label>
+                        <p className="text-white text-lg font-mono">{selectedApplication.txnId || selectedApplication._computedTxnId || '—'}</p>
+                      </div>
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">Status</label>
+                    <span className="inline-block px-2 py-1 rounded text-xs bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 uppercase tracking-wide">
+                      {selectedApplication.status}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">Email</label>
+                    <p className="text-white text-lg">{selectedApplication.email}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">Phone</label>
+                    <p className="text-white text-lg">{selectedApplication.phone}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">College</label>
+                    <p className="text-white text-lg">{selectedApplication.college}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">Year of Study</label>
+                    <p className="text-white text-lg">{selectedApplication.year}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">Domain</label>
+                    <p className="text-white text-lg">{selectedApplication.domain}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider block mb-1">Project</label>
+                    <p className="text-white text-lg">{selectedApplication.project}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs text-gray-500 uppercase tracking-wider block mb-2">Cover Letter</label>
+                  <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-gray-300 whitespace-pre-wrap leading-relaxed">
+                    {selectedApplication.coverLetter || 'No cover letter provided.'}
+                  </div>
+                </div>
+
+                {selectedApplication.resume && (
+                  <div className="pt-6 border-t border-white/10 flex justify-end">
+                    <a 
+                      href={`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}${selectedApplication.resume}`} 
+                      download
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-lg shadow-blue-500/20"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Download Resume
+                    </a>
+                  </div>
+                )}
+                <div className="flex items-center justify-between pt-6 border-t border-white/10">
+                  <div className="text-sm text-white/60">
+                    Application ID: <span className="font-mono">{selectedApplication.id}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={()=>removeApplication(selectedApplication.id)}
+                      className="px-3 py-2 rounded-lg bg-red-600/70 hover:bg-red-700 border border-red-600/40"
+                    >
+                      Delete Application
+                    </button>
+                    <button
+                      onClick={() => setSelectedApplication(null)}
+                      className="px-3 py-2 rounded-lg border border-white/20"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

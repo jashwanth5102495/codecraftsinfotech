@@ -263,6 +263,14 @@ class ApiService {
   async getApplications(): Promise<ApiResponse<any[]>> {
     return this.request<any[]>('/applications', { method: 'GET' }, true);
   }
+
+  async deleteApplication(id: string): Promise<ApiResponse<any>> {
+    const primary = await this.request<any>(`/applications/${encodeURIComponent(id)}`, { method: 'DELETE' }, true);
+    if (!primary.success && (primary.error||'').toLowerCase().includes('not found')) {
+      return this.request<any>(`/applications/${encodeURIComponent(id)}/delete`, { method: 'POST' }, true);
+    }
+    return primary;
+  }
 }
 
 export default new ApiService();

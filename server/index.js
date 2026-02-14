@@ -49,7 +49,11 @@ app.use(cors({
   },
   credentials: true,
 }));
-app.use('/uploads', express.static(uploadsDir));
+app.use('/uploads', express.static(uploadsDir, {
+  setHeaders: (res, filePath) => {
+    res.setHeader('Content-Disposition', 'attachment');
+  }
+}));
 
 // Simple admin token
 const ADMIN_USERNAME = 'admin';
@@ -134,6 +138,30 @@ app.post('/api/purchases', (req, res) => {
   };
   list.push(purchase);
   writePurchases(list);
+  // Attempt to attach transaction id to the latest matching application by email
+  try {
+    const apps = readApplications();
+    const email = String((body.student && body.student.email) || '').toLowerCase();
+    if (email && Array.isArray(apps) && apps.length > 0) {
+      let latestIdx = -1;
+      let latestTs = 0;
+      for (let i = 0; i < apps.length; i++) {
+        const a = apps[i];
+        if (String(a.email || '').toLowerCase() === email) {
+          const ts = Date.parse(a.createdAt || '') || 0;
+          if (ts >= latestTs) { latestTs = ts; latestIdx = i; }
+        }
+      }
+      if (latestIdx >= 0) {
+        apps[latestIdx].txnId = body.txnId;
+        apps[latestIdx].purchaseId = id;
+        apps[latestIdx].paymentRecordedAt = new Date().toISOString();
+        writeApplications(apps);
+      }
+    }
+  } catch (e) {
+    console.warn('Could not link purchase to application:', e);
+  }
   res.json({ success: true, data: purchase });
 });
 
@@ -285,6 +313,54 @@ app.get('/api/applications', (req, res) => {
   
   const applications = readApplications();
   res.json({ success: true, data: applications });
+});
+
+function deleteApplicationById(id){
+  const apps = readApplications();
+  const idx = apps.findIndex(a => String(a.id) === String(id));
+  if (idx === -1) return { ok:false, error:'Application not found' };
+  const [removed] = apps.splice(idx,1);
+  writeApplications(apps);
+  try {
+    const resume = removed && removed.resume;
+    if (resume && typeof resume === 'string' && resume.startsWith('/uploads/')) {
+      const filePath = path.join(__dirname, resume.replace(/^\//,''));
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+  } catch {}
+  return { ok:true, id };
+}
+
+app.delete('/api/applications/:id', (req, res) => {
+  const auth = req.headers.authorization || '';
+  const token = auth.replace('Bearer ', '');
+  if (token !== ADMIN_TOKEN) return res.status(401).json({ success: false, error: 'Unauthorized' });
+  const id = req.params.id;
+  const result = deleteApplicationById(id);
+  if (!result.ok) return res.status(404).json({ success:false, error: result.error });
+  res.json({ success:true, data: { id: result.id } });
+});
+
+// Defensive matcher in case some environments fail to route DELETE
+app.all('/api/applications/:id', (req, res, next) => {
+  if (req.method !== 'DELETE') return next();
+  const auth = req.headers.authorization || '';
+  const token = auth.replace('Bearer ', '');
+  if (token !== ADMIN_TOKEN) return res.status(401).json({ success: false, error: 'Unauthorized' });
+  const id = req.params.id;
+  const result = deleteApplicationById(id);
+  if (!result.ok) return res.status(404).json({ success:false, error: result.error });
+  res.json({ success:true, data: { id: result.id } });
+});
+
+app.post('/api/applications/:id/delete', (req, res) => {
+  const auth = req.headers.authorization || '';
+  const token = auth.replace('Bearer ', '');
+  if (token !== ADMIN_TOKEN) return res.status(401).json({ success: false, error: 'Unauthorized' });
+  const id = req.params.id;
+  const result = deleteApplicationById(id);
+  if (!result.ok) return res.status(404).json({ success:false, error: result.error });
+  res.json({ success:true, data: { id: result.id } });
 });
 
 // 404 fallback
