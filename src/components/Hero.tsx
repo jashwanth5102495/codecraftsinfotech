@@ -1,5 +1,5 @@
 import './SoftPro.css';
-import { heroPrimary, heroSecondary } from '@/brand';
+import { brandName, heroPrimary, heroSecondary } from '@/brand';
 import ShapeBlur from './ShapeBlur';
 import GhostCursor from './GhostCursor';
 import LogoLoop from './LogoLoop';
@@ -18,6 +18,7 @@ const Hero = () => {
       {/* Company Name Section */}
       <section className="softpro-hero relative min-h-screen pt-28 text-white">
         <div className="container mx-auto px-6">
+          <h1 className="sr-only">{brandName} software, AI and IT solutions</h1>
           {/* Tag pills */}
           <div className="flex justify-between items-center mb-8">
             <div className="space-y-2">

@@ -6,13 +6,38 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://codecraftsinfotech.in/#services</loc>
+    <loc>https://codecraftsinfotech.in/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://codecraftsinfotech.in/internship</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://codecraftsinfotech.in/#contact</loc>
+    <loc>https://codecraftsinfotech.in/contact</loc>
     <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://codecraftsinfotech.in/projects</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://codecraftsinfotech.in/projects/enroll</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://codecraftsinfotech.in/checkout</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://codecraftsinfotech.in/payment</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>
